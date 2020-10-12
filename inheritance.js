@@ -2,7 +2,96 @@
  * Oregon Trail -----------------------------------------------------------
  */
 
-// Create your Objects here.
+function Traveler(name) {
+  this.name = name;
+  this.food = 1;
+  this.isHealthy = true;
+}
+
+Traveler.prototype = {
+  constructor: Traveler,
+  hunt: function () {
+    this.food += 2;
+  },
+  eat: function () {
+    if (this.food == 0) {
+      this.isHealthy = false;
+    } else {
+      this.food--;
+    }
+  },
+};
+
+function Doctor(name) {
+  Traveler.call(this, name);
+}
+
+Doctor.prototype = Object.create(Traveler.prototype);
+Doctor.prototype.constructor = Doctor;
+Doctor.prototype.heal = function (traveler) {
+  traveler.isHealthy = true;
+};
+
+function Hunter(name) {
+  Traveler.call(this, name);
+  this.food = 2;
+}
+
+Hunter.prototype = Object.create(Traveler.prototype);
+Hunter.prototype.constructor = Hunter;
+Hunter.prototype.hunt = function () {
+  this.food += 5;
+};
+Hunter.prototype.eat = function () {
+  if (this.food >= 2) {
+    this.food -= 2;
+  } else if (this.food == 1) {
+    this.food--;
+    this.isHealthy = false;
+  } else if (this.food == 0) {
+    this.isHealthy = false;
+  }
+};
+
+Hunter.prototype.giveFood = function (traveler, numOfFoodUnits) {
+  if (numOfFoodUnits <= this.food) {
+    this.food -= numOfFoodUnits;
+    traveler.food += numOfFoodUnits;
+  }
+};
+
+function Wagon(capacity) {
+  this.capacity = capacity;
+  this.passengers = [];
+}
+
+Wagon.prototype = {
+  constructor: Wagon,
+  getAvailableSeatCount: function () {
+    return this.capacity - this.passengers.length;
+  },
+  join: function (traveler) {
+    if (this.getAvailableSeatCount() > 0) {
+      this.passengers.push(traveler);
+    }
+  },
+  shouldQuarantine: function () {
+    for (let traveler = 0; traveler < this.passengers.length; traveler++) {
+      if (this.passengers[traveler].isHealthy == false) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+  totalFood: function () {
+    let totalFood = 0;
+    for (let traveler = 0; traveler < this.passengers.length; traveler++) {
+      totalFood += this.passengers[traveler].food;
+    }
+    return totalFood;
+  },
+};
 
 /**
  * TESTS -----------------------------------------------------------
